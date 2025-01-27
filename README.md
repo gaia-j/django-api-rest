@@ -19,6 +19,17 @@ Desafio feito seguindo as regras propostas:
    do front (JS nativo, jQuery, Vue3, React, etc...)  
    d. Utilização de bibliotecas populares como Bootstrap são bem vindas
 
+# Features
+
+* Criar produto
+* Listar produtos
+* Detalher produto
+* Deletar produto
+* Deletar multiplos produtos
+* Paginação na tabela
+* Queries customizadas para ordenação e filtro
+* Compressão e conversão de imagens para webp, com a finalidade de reduzir o tamanho das imagens
+
 # Como iniciar
 
 ### Docker ou docker engine recomendados para facilitar a execução
@@ -30,15 +41,7 @@ Desafio feito seguindo as regras propostas:
  
 **caso receba um erro do backend no docker compose, o back apenas carregou antes do DB e não conseguiu se conectar, mas  ele reinicia e logo consegue**
 
-# Features
 
-* Criar produto
-* Listar produtos
-* Detalher produto
-* Deletar produto
-* Deletar multiplos produtos
-* Paginação na tabela
-* Queries customizadas para ordenação e filtro
 
 ## Imagens
 ![Tabela](assets/table.png)
