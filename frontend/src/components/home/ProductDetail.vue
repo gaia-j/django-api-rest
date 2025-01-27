@@ -64,7 +64,7 @@
         </v-row>
       </v-card-text>
 
-      <v-card-actions>
+      <v-card-actions :class="$style.buttonsRow">
 
         <v-btn v-if="!isCreateProduct" text="Atualizar" prepend-icon="mdi-check-circle" @click="createUpdateProduct"/>
         <v-btn v-else text="Criar" prepend-icon="mdi-plus" @click="createUpdateProduct"/>
@@ -191,6 +191,12 @@ export default {
 
 .productImage img {
   max-width: 500px;
+}
+
+.buttonsRow{
+  display: flex;
+  flex-wrap: wrap;
 
 }
+
 </style>

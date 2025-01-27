@@ -84,15 +84,17 @@ export default {
         this.filterQuery = `?page=${event.page}&itemsPerPage=${event.itemsPerPage}&search=${this.search}&sortBy=${sortBy}`
       }
       await getProducts(this.filterQuery).then((response) => {
-        const res = response.data;
+        let res = response.data;
+        res.results.forEach((product) => {
+          product.price = product.price/100;
+        });
         this.products = res.results;
         this.totalItems = res.count;
         this.loading = false;
       })
     },
-    formatPrice(priceInCents) {
-      const priceInReais = priceInCents / 100;
-      return `R$ ${priceInReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    formatPrice(price) {
+      return `R$ ${price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     },
   },
   computed: {
@@ -118,7 +120,10 @@ export default {
   },
   async mounted() {
     await getProducts().then((response) => {
-      const res = response.data;
+      let res = response.data;
+      res.results.forEach((product) => {
+        product.price = product.price/100;
+      });
       this.products = res.results;
       this.totalItems = res.count;
       this.loading = false;
