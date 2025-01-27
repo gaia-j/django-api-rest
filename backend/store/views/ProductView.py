@@ -1,4 +1,5 @@
 # Create your views here.
+import json
 from gc import get_objects
 
 from PIL import Image
@@ -7,6 +8,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from store.models.ProductModel import Product
@@ -26,9 +29,40 @@ def compress_convert_image(image):
 class ProductListView(APIView):
 
     def get(self, request):
+        items_per_page = request.query_params.get("itemsPerPage", 10)
+        page = request.query_params.get("page", 1)
+        search = request.query_params.get("search", "")
+        try:
+            items_per_page = int(items_per_page)
+        except ValueError:
+            raise ValidationError("itemsPerPage must be an integer.")
+
         products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        if search:
+            products = products.filter(name__icontains=search)
+
+        sort_by = request.query_params.get("sortBy", "[]")
+        try:
+            sort_by = json.loads(sort_by)
+
+        except json.JSONDecodeError:
+            sort_by = []
+
+        for sort_item in sort_by:
+            field = sort_item.get("key")
+            order = sort_item.get("order", "asc")
+            if field in ["id", "price", "name"]:
+                if order == "desc":
+                    field = f"-{field}"
+                products = products.order_by(field)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = items_per_page
+        paginated_products = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(paginated_products, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
@@ -42,6 +76,25 @@ class ProductListView(APIView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        product_ids = request.data.get('product_ids', [])
+
+        if not product_ids:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            products_to_delete = Product.objects.filter(id__in=product_ids)
+            if len(products_to_delete) != len(product_ids):
+                invalid_ids = set(product_ids) - set(products_to_delete.values_list('id', flat=True))
+                return Response(
+                    {'error': f'IDs inválidos: {invalid_ids}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            deleted_count, _ = products_to_delete.delete()
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ProductDetailView(APIView):
     def get(self, request, pk):
@@ -60,9 +113,3 @@ class ProductDetailView(APIView):
         product = get_object_or_404(Product, pk=pk)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-
-
-
