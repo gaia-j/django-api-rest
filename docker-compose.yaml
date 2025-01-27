@@ -16,7 +16,7 @@ services:
   backend:
     build: ./backend
     container_name: django_backend
-    restart: no
+    restart: on-failure
     volumes:
       - ./backend:/app
     working_dir: /app
