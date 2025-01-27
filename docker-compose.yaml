@@ -14,7 +14,7 @@ services:
       - "3306:3306"
 
   backend:
-    image: python:3.13
+    build: ./backend
     container_name: django_backend
     restart: no
     volumes:
@@ -22,21 +22,20 @@ services:
     working_dir: /app
     ports:
       - "8000:8000"
-    command: >
-      sh -c "pip install -r requirements.txt &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=core.settings
       - DB_HOST=db
-      - DB_NAME=mydb
+      - DB_NAME=db
       - DB_USER=user
       - DB_PASSWORD=password
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
 
   frontend:
-    image: node:lts
+    build: ./frontend
     container_name: vue_frontend
     restart: no
     volumes:
@@ -44,15 +43,10 @@ services:
     working_dir: /app
     ports:
       - "5173:5173"
-    command: >
-      sh -c "npm install &&
-             npm run build &&
-             npx http-server dist -p 5173"
     environment:
       - NODE_ENV=development
     depends_on:
       - backend
-
 
 volumes:
   mysql_data:
