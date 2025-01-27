@@ -1,4 +1,86 @@
 
+<template>
+  <v-dialog v-model="activeInternal" max-width="500">
+    <v-card>
+      <v-card-title v-if="!isCreateProduct">{{ `${product.id} - ${product.name}` }}</v-card-title>
+      <v-card-title v-else>Criar Produto</v-card-title>
+      <v-card-text>
+        <v-row dense>
+          <v-col
+              cols="12"
+              md="6"
+              sm="6"
+          >
+            <v-text-field
+                label="Nome"
+                required
+                :model-value="updateProductData?.name"
+                @update:model-value="updateField('name', $event)"
+            />
+          </v-col>
+          <v-col
+              cols="12"
+              md="6"
+              sm="6"
+          >
+            <v-text-field
+                label="Preço"
+                required
+                type="number"
+                prefix="R$"
+                :model-value="updateProductData?.price"
+                @update:model-value="updateField('price', $event)"
+
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+              cols="12"
+              md="12"
+              sm="12"
+          >
+            <v-textarea
+                label="Descrição"
+                required
+                :model-value="updateProductData?.description"
+                @update:model-value="updateField('description', $event)"
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-file-input
+              label="Enviar imagem"
+              show-size
+              accept="image/*"
+              @update:model-value="updateImage"
+          />
+        </v-row>
+        <v-row>
+          <v-img
+              :class="$style.productImage"
+              :src="previewUrl || `http://localhost:8000/${updateProductData.image}`"
+          />
+        </v-row>
+      </v-card-text>
+
+      <v-card-actions>
+
+        <v-btn v-if="!isCreateProduct" text="Atualizar" prepend-icon="mdi-check-circle" @click="createUpdateProduct"/>
+        <v-btn v-else text="Criar" prepend-icon="mdi-plus" @click="createUpdateProduct"/>
+
+        <v-spacer v-if="!isCreateProduct"/>
+        <v-btn v-if="!isCreateProduct" text="Excluir" prepend-icon="mdi-trash-can-outline" @click="deleteProductF"/>
+        <v-spacer/>
+
+        <v-btn prepend-icon="mdi-close" text="Cancelar" @click="closeDialog"/>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+
+
+
 <script>
 import {createProduct, deleteProduct, updateProduct} from "@/api/api.ts";
 
@@ -59,10 +141,12 @@ export default {
         }).then(() => {
           this.$emit("update:active", false);
           this.$emit("update:isCreateProduct", false);
+          this.$emit("update:shouldUpdate");
+          URL.revokeObjectURL(this.previewUrl);
+          this.previewUrl = null;
         })
         return
       }
-
       await updateProduct(this.updateProductData.id, {
         name: this.updateProductData.name,
         price: this.updateProductData.price,
@@ -70,6 +154,9 @@ export default {
         image: this.selectedImage,
       }).then(() => {
         this.$emit("update:active", false);
+        this.$emit("update:shouldUpdate", true);
+        URL.revokeObjectURL(this.previewUrl);
+        this.previewUrl = null;
       });
 
     },
@@ -93,84 +180,6 @@ export default {
   },
 };
 </script>
-
-
-<template>
-  <v-dialog v-model="activeInternal" max-width="500">
-    <v-card>
-      <v-card-title v-if="!isCreateProduct">{{ `${product.id} - ${product.name}` }}</v-card-title>
-      <v-card-title v-else>Criar Produto</v-card-title>
-      <v-card-text>
-        <v-row dense>
-          <v-col
-              cols="12"
-              md="6"
-              sm="6"
-          >
-            <v-text-field
-                label="Nome"
-                required
-                :model-value="updateProductData?.name"
-                @update:model-value="updateField('name', $event)"
-            />
-          </v-col>
-          <v-col
-              cols="12"
-              md="6"
-              sm="6"
-          >
-            <v-text-field
-                label="Preço"
-                required
-                type="number"
-                prefix="R$"
-                :model-value="updateProductData?.price"
-                @update:model-value="updateField('price', $event)"
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col
-              cols="12"
-              md="12"
-              sm="12"
-          >
-            <v-textarea
-                label="Descrição"
-                required
-                :model-value="updateProductData?.description"
-                @update:model-value="updateField('description', $event)"
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-file-input
-              label="Enviar imagem"
-              show-size
-              accept="image/*"
-              @update:model-value="updateImage"
-          />
-        </v-row>
-        <v-row>
-          <v-img
-              :class="$style.productImage"
-              :src="previewUrl || `http://localhost:8000/${updateProductData.image}`"
-          />
-        </v-row>
-      </v-card-text>
-
-      <v-card-actions>
-        <v-btn v-if="!isCreateProduct" text="Atualizar" prepend-icon="mdi-check-circle" @click="createUpdateProduct"/>
-        <v-btn v-else text="Criar" prepend-icon="mdi-plus" @click="createUpdateProduct"/>
-        <v-spacer v-if="!isCreateProduct"/>
-        <v-btn v-if="!isCreateProduct" text="Excluir" prepend-icon="mdi-trash-can-outline" @click="deleteProductF"/>
-        <v-spacer/>
-        <v-btn prepend-icon="mdi-close" text="Cancelar" @click="closeDialog"/>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-
 
 
 <style module>

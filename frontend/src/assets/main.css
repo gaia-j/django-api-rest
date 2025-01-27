@@ -5,6 +5,9 @@
   margin: 0;
   font-weight: normal;
   width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 }
 
 a,
@@ -21,14 +24,17 @@ a,
   }
 }
 body{
-  background-color: var(--v-theme-background); /* Fundo do tema */
-  color: var(--v-theme-on-background); /* Cor do texto */
+  background-color: var(--v-theme-background);
+  color: var(--v-theme-on-background);
 }
 
 @media (min-width: 1024px) {
   body {
     display: flex;
     place-items: center;
+    justify-content: center;
+    align-items: center;
+
   }
 
   #app {

@@ -12,9 +12,8 @@ interface ProductInterface {
   image: File | null
 }
 
-
-export const getProducts = async () => {
-  return await api.get('/products/')
+export const getProducts = async (queryString?: string) => {
+  return await api.get(`/products/${queryString ? queryString : ''}`)
 }
 
 export const getProduct = async (id: number) => {
@@ -39,4 +38,12 @@ export const updateProduct = async (id: number, data: ProductInterface) => {
 
 export const deleteProduct = async (id: number) => {
   return await api.delete(`/products/${id}/`)
+}
+
+export const deleteMultipleProducts = async (ids: number[]) => {
+  return await api.delete('/products/', {
+    data: {
+      product_ids: ids
+    }
+  })
 }
