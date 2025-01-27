@@ -25,7 +25,7 @@ Desafio feito seguindo as regras propostas:
 
 1. Clone o repositório
 2. Entre na pasta do projeto
-3. Execute o comando `docker-compose up`
+3. Execute o comando `docker-compose up --build`
 4. Com sorte, o front estará disponível em `http://localhost:5173` e o backend em `http://localhost:8000`
 
 # Features
