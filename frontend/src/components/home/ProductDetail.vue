@@ -135,7 +135,7 @@ export default {
       if (this.isCreateProduct){
         await createProduct({
           name: this.updateProductData.name,
-          price: this.updateProductData.price,
+          price: this.updateProductData.price*100,
           description: this.updateProductData.description,
           image: this.selectedImage,
         }).then(() => {
