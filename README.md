@@ -27,6 +27,8 @@ Desafio feito seguindo as regras propostas:
 2. Entre na pasta do projeto
 3. Execute o comando `docker-compose up --build`
 4. Com sorte, o front estará disponível em `http://localhost:5173` e o backend em `http://localhost:8000`
+ 
+**caso receba um erro do backend no docker compose, o back apenas carregou antes do DB e não conseguiu se conectar, mas  ele reinicia e logo consegue**
 
 # Features
 
